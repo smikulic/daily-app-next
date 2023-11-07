@@ -1,0 +1,64 @@
+.loginPage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px;
+  height: 100vh;
+}
+
+.loginPage .title {
+  padding: 0 16px;
+  width: 360px;
+  font-weight: 300;
+  font-size: 28px;
+  margin-bottom: 16px;
+}
+
+.loginPage .form {
+  display: flex;
+  flex-direction: column;
+  padding: 0 16px;
+  width: 360px;
+}
+
+.loginPage .form .formField {
+  margin-bottom: 16px;
+}
+
+.loginPage .form label {
+  display: block;
+  padding-bottom: 6px;
+  font-size: 13px;
+}
+.loginPage .form input {
+  padding: 10px 12px;
+  width: 100%;
+  border: 1px solid #000;
+  border-radius: 5px;
+}
+
+.loginPage .form .actions {
+  display: flex;
+  flex-direction: column;
+  margin-top: 24px;
+}
+
+.loginPage .form .actions button {
+  padding: 10px 12px;
+  width: 100%;
+  font-size: 16px;
+  color: black;
+  background-color: #41efcd;
+  border: 1px solid black;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.loginPage .form .actions button:hover {
+  opacity: 0.8;
+}
+
+.loginPage .link {
+  color: #f199c0;
+  border-bottom: 1px solid #f199c0;
+  cursor: pointer;
+}
