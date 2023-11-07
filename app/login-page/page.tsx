@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import { signIn } from "next-auth/react";
-import Signin from "../signInButton";
-import "./page.css";
 import { Session } from "next-auth";
+// import { toast } from "react-toastify";
+import { signIn } from "next-auth/react";
+import "./page.css";
 
 export default function SignInPage({ session }: { session: Session | null }) {
   const [formState, setFormState] = useState({
@@ -36,27 +35,6 @@ export default function SignInPage({ session }: { session: Session | null }) {
       password: formState.password,
       authFlowType: "register",
     });
-
-    // fetch("/api/auth/register", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({
-    //     email: formState.email,
-    //     password: formState.password,
-    //   }),
-    // }).then(async (res) => {
-    //   if (res.status === 200) {
-    //     console.log("Account created!");
-    //     // setTimeout(() => {
-    //     //   router.push("/login");
-    //     // }, 2000);
-    //   } else {
-    //     const { error } = await res.json();
-    //     toast.error(error);
-    //   }
-    // });
   };
 
   console.log("SignInPage: ", { session });

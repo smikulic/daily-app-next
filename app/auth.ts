@@ -71,10 +71,6 @@ export const {
       },
       async authorize(credentials, req) {
         // Add logic here to look up the user from the credentials supplied
-
-        console.log("Authorize!");
-        console.log({ credentials });
-
         if (!credentials?.email || !credentials?.password) return null;
 
         try {
@@ -90,7 +86,6 @@ export const {
             email: credentials.email as string,
             password: credentials.password as string,
           });
-          // const user = { id: "1", name: "J Smith", email: "jsmith@example.com" };
           return user;
         } catch (e) {
           console.error(e);

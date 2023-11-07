@@ -1,7 +1,6 @@
-import prisma from "@/lib/prisma";
-import { signIn, signOut } from "next-auth/react";
+// import prisma from "@/lib/prisma";
+// import { signIn, signOut } from "next-auth/react";
 import { auth } from "./auth";
-import Signin from "./signInButton";
 
 export default async function HomePage() {
   // const users = await prisma.user.findMany();
@@ -18,13 +17,6 @@ export default async function HomePage() {
           <h1 className="font-bold text-2xl">
             Home page - {session?.user?.email}
           </h1>
-          {/* <Signin /> */}
-          {/* <button
-            onClick={() => signIn("credentials")}
-          >
-            Sign in
-          </button> */}
-          {/* <button onClick={(e) => getLogin(e)}>GET</button> */}
         </div>
       </div>
     </div>
