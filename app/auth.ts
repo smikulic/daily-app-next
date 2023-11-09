@@ -14,9 +14,7 @@ type LoginFnType = ({
 
 export const login: LoginFnType = async ({ email, password }) => {
   const user = await prisma.user.findUnique({
-    where: {
-      email: email,
-    },
+    where: { email },
   });
   if (user && (await compare(password, user.password))) {
     console.log("User Found!");
@@ -99,5 +97,14 @@ export const {
   ],
   pages: {
     signIn: "/login-page",
+  },
+  callbacks: {
+    session: ({ session, token }) => ({
+      ...session,
+      user: {
+        ...session.user,
+        id: token.sub,
+      },
+    }),
   },
 });
