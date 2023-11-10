@@ -17,8 +17,14 @@ const theme = createTheme({
       contrastText: "#181818",
     },
     secondary: {
+      main: "#6a1fde",
+      contrastText: "#fff",
+      // main: "#f199c0",
+      // contrastText: "#6a1fde",
+    },
+    ternary: {
       main: "#f199c0",
-      contrastText: "#6a1fde",
+      // contrastText: "#6a1fde",
     },
     warning: {
       main: "#eec22f",
