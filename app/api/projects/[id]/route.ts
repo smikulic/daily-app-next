@@ -1,15 +1,18 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@/app/auth";
+import { ensureAuthenticated } from "../../utils";
 
 // DELETE /api/project/:id
 export async function DELETE(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  // const session = await auth();
-  // const userId = session?.user.id;
-  // ensureAuthenticated(currentUser);
+  const session = await auth();
+
+  if (!ensureAuthenticated(session)) {
+    return new NextResponse("Unauthenticated!", { status: 401 });
+  }
 
   try {
     const deletedProject = await prisma.project.delete({
@@ -19,7 +22,7 @@ export async function DELETE(
     });
 
     return new NextResponse(JSON.stringify(deletedProject), {
-      status: 201,
+      status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error: any) {
