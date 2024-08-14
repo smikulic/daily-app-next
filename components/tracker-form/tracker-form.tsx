@@ -27,6 +27,7 @@ export default function TrackerForm({ refetchTimeEntries }: TrackerFormType) {
       .then((res) => res.json())
       .then((data) => {
         setProjectsData(data);
+        setSelectedProjectId(data[0].id);
         // setLoading(false);
       });
   };
@@ -44,7 +45,6 @@ export default function TrackerForm({ refetchTimeEntries }: TrackerFormType) {
   };
 
   const handleTimeEntryDateChange = (newValue: any) => {
-    console.log("newValue:", newValue);
     setTimeEntryDate(newValue);
   };
 
@@ -54,13 +54,13 @@ export default function TrackerForm({ refetchTimeEntries }: TrackerFormType) {
     const selectedProject: Project = projectsData.filter(
       (project: Project) => project.id === selectedProjectId
     )[0];
-    const billableAmount = selectedProject.rate * hours;
+    const billableAmount = selectedProject?.rate * hours;
 
     fetch("/api/time-entries", {
       method: "POST",
       body: JSON.stringify({
         name,
-        date: timeEntryDate.endDate,
+        date: new Date(timeEntryDate.endDate).toISOString(),
         hours: Number(hours),
         billableAmount: Number(billableAmount),
         projectId: selectedProjectId,
@@ -72,15 +72,17 @@ export default function TrackerForm({ refetchTimeEntries }: TrackerFormType) {
 
         setLoading(false);
         setName("");
-        // setRate(0);
+        setHours(0);
+        setTimeEntryDate({
+          startDate: new Date(),
+          endDate: new Date(),
+        });
       });
   };
 
   useEffect(() => {
     getProjects();
   }, []);
-
-  console.log("TrackerForm: ");
 
   return (
     <div className="relative my-8 h-16 w-10/12 border border-violet-300 rounded-xl">
@@ -89,7 +91,7 @@ export default function TrackerForm({ refetchTimeEntries }: TrackerFormType) {
         name="name"
         id="name"
         placeholder="What are you working on?"
-        className="block w-full h-full pl-4 pr-20 rounded-2xl text-xl text-gray-700 placeholder:text-gray-400 focus:outline-none"
+        className="block w-full h-full pl-4 pr-20 rounded-2xl text-l text-gray-700 placeholder:text-gray-400 focus:outline-none"
         value={name}
         onChange={handleNameChange}
       />
@@ -98,7 +100,7 @@ export default function TrackerForm({ refetchTimeEntries }: TrackerFormType) {
           <select
             id="project"
             name="project"
-            className="h-full w-32 bg-transparent text-sm text-gray-700 truncate focus:outline-none"
+            className="h-full w-28 bg-transparent text-sm text-gray-700 truncate focus:outline-none"
             value={selectedProjectId}
             onChange={handleProjectChange}
           >
@@ -109,9 +111,6 @@ export default function TrackerForm({ refetchTimeEntries }: TrackerFormType) {
                 </option>
               );
             })}
-            {/* <option>Glean Analytics hehe</option>
-            <option>Project 2</option>
-            <option>Project 3</option> */}
           </select>
         </div>
         <div className="h-full flex items-center px-2">
@@ -123,6 +122,7 @@ export default function TrackerForm({ refetchTimeEntries }: TrackerFormType) {
             placeholder={"Date"}
             displayFormat={"DD MMM YY"}
             inputClassName="w-28 text-sm focus:outline-none"
+            toggleClassName="absolute right-0 h-full text-gray-400 focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed"
           />
         </div>
         <div className="h-full flex items-center px-2">
