@@ -1,8 +1,10 @@
 "use client";
 
+import EditTrackerForm from "@/components/edit-tracker-form/edit-tracker-form";
+import { FormDialog } from "@/components/form-dialog";
 // import prisma from "@/lib/prisma";
 import TrackerForm from "@/components/tracker-form/tracker-form";
-// import { TimeEntry } from "@prisma/client";
+import { TimeEntry } from "@prisma/client";
 import { useEffect, useState } from "react";
 
 export default function TrackerPage() {
@@ -12,6 +14,10 @@ export default function TrackerPage() {
   const [timeEntryData, setTimeEntryData] = useState([]);
   const [isLoading, setLoading] = useState(true);
   const [isRemoveTimeEntryLoading, setRemoveTimeEntryLoading] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [selectedTimeEntry, setSelectedTimeEntry] = useState<TimeEntry | null>(
+    null
+  );
 
   const getTimeEntries = async () => {
     try {
@@ -26,15 +32,11 @@ export default function TrackerPage() {
     }
   };
 
-  const onDeleteTimeEntry = async ({
-    timeEntryId,
-  }: {
-    timeEntryId: string;
-  }) => {
+  const onDeleteTimeEntry = async ({ entryId }: { entryId: string }) => {
     setRemoveTimeEntryLoading(true);
 
     try {
-      await fetch(`/api/time-entries/${timeEntryId}`, {
+      await fetch(`/api/time-entries/${entryId}`, {
         method: "DELETE",
       });
 
@@ -49,6 +51,16 @@ export default function TrackerPage() {
   useEffect(() => {
     getTimeEntries();
   }, []);
+
+  const handleEditOpen = (timeEntry: TimeEntry) => {
+    setSelectedTimeEntry(timeEntry);
+    setEditOpen(true);
+  };
+
+  const handleEditClose = () => {
+    setEditOpen(false);
+    setSelectedTimeEntry(null);
+  };
 
   return (
     <>
@@ -67,7 +79,8 @@ export default function TrackerPage() {
         {!isLoading &&
           timeEntryData?.length > 0 &&
           timeEntryData.map((timeEntry: any) => {
-            const timeEntryId = timeEntry.id;
+            const entryId = timeEntry.id;
+            const entryName = timeEntry.name;
             const formattedBillableAmount = new Intl.NumberFormat("DE-de", {
               style: "currency",
               currency: timeEntry.project.currency,
@@ -76,13 +89,16 @@ export default function TrackerPage() {
             }).format(timeEntry.billableAmount);
 
             return (
-              <div key={timeEntryId} className="relative h-16 w-full mb-2">
+              <div key={entryId} className="relative h-16 w-full mb-2">
                 <div className="flex items-center justify-between px-4 h-16 bg-white border border-violet-100 rounded-l">
-                  <div>{timeEntry.name}</div>
-                  <div>{formattedBillableAmount}</div>
+                  <div>{entryName}</div>
+                  <div className="flex flex-col items-end">
+                    <div>{timeEntry.hours} h</div>
+                    <div>{formattedBillableAmount}</div>
+                  </div>
                 </div>
                 <div className="absolute top-0 opacity-0 flex items-center justify-between px-4 h-16 w-full bg-violet-50 border border-violet-100 rounded-l hover:opacity-100 hover:z-10">
-                  <div>{timeEntry.name}</div>
+                  <div>{entryName}</div>
                   <div className="flex justify-end">
                     {isRemoveTimeEntryLoading && (
                       <div className="flex items-center">
@@ -110,12 +126,15 @@ export default function TrackerPage() {
                     )}
                     {!isRemoveTimeEntryLoading && (
                       <>
-                        <div className="mx-3 text-violet-900 cursor-pointer">
+                        <div
+                          className="mx-3 text-violet-900 cursor-pointer"
+                          onClick={() => handleEditOpen(timeEntry)}
+                        >
                           Edit
                         </div>
                         <div
                           className="mx-3 text-red-700 cursor-pointer"
-                          onClick={() => onDeleteTimeEntry({ timeEntryId })}
+                          onClick={() => onDeleteTimeEntry({ entryId })}
                         >
                           Remove
                         </div>
@@ -123,6 +142,19 @@ export default function TrackerPage() {
                     )}
                   </div>
                 </div>
+                {selectedTimeEntry && (
+                  <FormDialog
+                    title={`Update ${selectedTimeEntry.name}`}
+                    open={editOpen}
+                    onClose={handleEditClose}
+                  >
+                    <EditTrackerForm
+                      refetchTimeEntries={getTimeEntries}
+                      onClose={handleEditClose}
+                      initialData={selectedTimeEntry}
+                    />
+                  </FormDialog>
+                )}
               </div>
             );
           })}
