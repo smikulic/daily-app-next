@@ -2,7 +2,7 @@
 
 // import prisma from "@/lib/prisma";
 import TrackerForm from "@/components/tracker-form/tracker-form";
-import { TimeEntry } from "@prisma/client";
+// import { TimeEntry } from "@prisma/client";
 import { useEffect, useState } from "react";
 
 export default function TrackerPage() {
@@ -14,12 +14,16 @@ export default function TrackerPage() {
   const [isRemoveTimeEntryLoading, setRemoveTimeEntryLoading] = useState(false);
 
   const getTimeEntries = async () => {
-    fetch("/api/time-entries")
-      .then((res) => res.json())
-      .then((data) => {
-        setTimeEntryData(data);
-        setLoading(false);
-      });
+    try {
+      const res = await fetch("/api/time-entries");
+      const data = await res.json();
+
+      setTimeEntryData(data);
+      setLoading(false);
+      setRemoveTimeEntryLoading(false);
+    } catch (error) {
+      console.error("Error fetching time entries:", error);
+    }
   };
 
   const onDeleteTimeEntry = async ({
@@ -29,20 +33,22 @@ export default function TrackerPage() {
   }) => {
     setRemoveTimeEntryLoading(true);
 
-    fetch(`/api/time-entries/${timeEntryId}`, {
-      method: "DELETE",
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        getTimeEntries();
+    try {
+      await fetch(`/api/time-entries/${timeEntryId}`, {
+        method: "DELETE",
       });
+
+      getTimeEntries();
+    } catch (error) {
+      console.error("Error deleting time entry:", error);
+    }
+
+    setRemoveTimeEntryLoading(true);
   };
 
   useEffect(() => {
     getTimeEntries();
   }, []);
-
-  console.log("TrackerPage: ", { timeEntryData });
 
   return (
     <>
@@ -65,6 +71,8 @@ export default function TrackerPage() {
             const formattedBillableAmount = new Intl.NumberFormat("DE-de", {
               style: "currency",
               currency: timeEntry.project.currency,
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 0,
             }).format(timeEntry.billableAmount);
 
             return (
@@ -72,7 +80,6 @@ export default function TrackerPage() {
                 <div className="flex items-center justify-between px-4 h-16 bg-white border border-violet-100 rounded-l">
                   <div>{timeEntry.name}</div>
                   <div>{formattedBillableAmount}</div>
-                  {/* <div>{formattedRate}</div> */}
                 </div>
                 <div className="absolute top-0 opacity-0 flex items-center justify-between px-4 h-16 w-full bg-violet-50 border border-violet-100 rounded-l hover:opacity-100 hover:z-10">
                   <div>{timeEntry.name}</div>

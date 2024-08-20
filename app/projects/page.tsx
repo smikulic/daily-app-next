@@ -21,13 +21,16 @@ export default function ProjectsPage() {
   const [isRemoveProjectLoading, setRemoveProjectLoading] = useState(false);
 
   const getProjects = async () => {
-    fetch("/api/projects")
-      .then((res) => res.json())
-      .then((data) => {
-        setProjectsData(data);
-        setLoading(false);
-        setRemoveProjectLoading(false);
-      });
+    try {
+      const res = await fetch("/api/projects");
+      const data = await res.json();
+
+      setProjectsData(data);
+      setLoading(false);
+      setRemoveProjectLoading(false);
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+    }
   };
 
   // const onCreateProject = async ({
@@ -64,8 +67,6 @@ export default function ProjectsPage() {
     getProjects();
   }, []);
 
-  console.log("ProjectsPage: ", { projectsData });
-
   return (
     <>
       <ProjectForm
@@ -87,6 +88,8 @@ export default function ProjectsPage() {
             const formattedRate = new Intl.NumberFormat("DE-de", {
               style: "currency",
               currency: project.currency,
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 0,
             }).format(project.rate);
 
             return (
